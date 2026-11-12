@@ -7,8 +7,7 @@ final class Settings {
     static let shared = Settings()
     private let d = UserDefaults.standard
 
-    /// Corner radius in points. 10pt matches the hardware top-corner radius of the
-    /// notched 14"/16" MacBook Pro closely; use Calibrate to fine-tune on your panel.
+    /// Corner radius in points. Default 26pt; use Calibrate to match the hardware top corners.
     var radius: Double { didSet { d.set(radius, forKey: "radius") } }
     /// Apple's hardware uses a continuous (squircle-like) curve, not a circular arc.
     var continuous: Bool { didSet { d.set(continuous, forKey: "continuous") } }
@@ -20,7 +19,7 @@ final class Settings {
     var calibrating = false
 
     private init() {
-        d.register(defaults: ["radius": 10.0, "continuous": true, "enabled": true,
+        d.register(defaults: ["radius": 26.0, "continuous": true, "enabled": true,
                               "roundTop": false, "builtInOnly": true])
         radius = d.double(forKey: "radius")
         continuous = d.bool(forKey: "continuous")

@@ -9,11 +9,11 @@ A tiny macOS menu-bar app that rounds the square bottom corners of a MacBook dis
 open build/RoundCorners.app
 ```
 
-Requires macOS 14+ and a Swift 6 toolchain.
+Requires macOS 26+ and a Swift 6 toolchain.
 
 ## Usage
 
-- **Radius:** defaults to 10 pt with Apple's continuous (squircle) curve.
+- **Radius:** defaults to 26 pt with Apple's continuous (squircle) curve.
 - **Calibrate:** draws a red guide on the top corners. Lower the radius until the line just disappears behind the physical edge; the bottom corners then match your hardware.
 - **Options:** round the top corners too (useful on external displays), limit to the built-in display, and launch at login. For launch at login to work best, move the app to `/Applications`.
 

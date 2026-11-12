@@ -15,16 +15,19 @@ final class Settings {
     /// Also mask the top corners (useful on external displays, which have none).
     var roundTop: Bool { didSet { d.set(roundTop, forKey: "roundTop") } }
     var builtInOnly: Bool { didSet { d.set(builtInOnly, forKey: "builtInOnly") } }
+    /// Hide the status item; reopening the app brings it back.
+    var hideIcon: Bool { didSet { d.set(hideIcon, forKey: "hideIcon") } }
     /// Draws a red guide on the top corners so the radius can be matched to the hardware.
     var calibrating = false
 
     private init() {
         d.register(defaults: ["radius": 26.0, "continuous": true, "enabled": true,
-                              "roundTop": false, "builtInOnly": true])
+                              "roundTop": false, "builtInOnly": true, "hideIcon": false])
         radius = d.double(forKey: "radius")
         continuous = d.bool(forKey: "continuous")
         enabled = d.bool(forKey: "enabled")
         roundTop = d.bool(forKey: "roundTop")
         builtInOnly = d.bool(forKey: "builtInOnly")
+        hideIcon = d.bool(forKey: "hideIcon")
     }
 }

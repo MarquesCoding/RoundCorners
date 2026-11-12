@@ -30,9 +30,17 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         build()
         menu.delegate = self
         item.menu = menu
+        item.isVisible = !settings.hideIcon
     }
 
     func open() { item.button?.performClick(nil) }
+
+    /// Called when the app is opened again while running (Spotlight, Finder, `open`).
+    func showIcon() {
+        settings.hideIcon = false
+        item.isVisible = true
+        DispatchQueue.main.async { self.open() }
+    }
 
     // MARK: Building
 
@@ -57,6 +65,7 @@ final class StatusMenu: NSObject, NSMenuDelegate {
         calibrateItem = action("Calibrate Against Top Corners", symbol: "scope", #selector(toggleCalibrate))
         _ = action("Reset Radius to 26 pt", symbol: "arrow.counterclockwise", #selector(reset))
         loginItem = action("Launch at Login", symbol: "power", #selector(toggleLogin))
+        _ = action("Hide Menu Bar Icon…", symbol: "eye.slash", #selector(hideIcon))
         menu.addItem(.separator())
 
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "dev"
@@ -126,16 +135,19 @@ final class StatusMenu: NSObject, NSMenuDelegate {
 
     // MARK: State
 
-    /// Controls only draw with the accent colour while their app is active, so activate for the
-    /// lifetime of the menu and hand focus back to the previous app afterwards.
+    /// Controls only draw with the accent colour while their app is active. A menu-bar app is never
+    /// frontmost, so force-activate for the lifetime of the menu (plain `activate()` is refused while
+    /// another app is frontmost) and hand focus back to the previous app afterwards.
     private var previousApp: NSRunningApplication?
 
     func menuWillOpen(_ menu: NSMenu) {
         refresh()
         let front = NSWorkspace.shared.frontmostApplication
         if front != .current { previousApp = front }
-        NSApp.activate()
+        Self.forceActivate()
     }
+
+    private static func forceActivate() { (NSApp as LegacyActivation).activate(ignoringOtherApps: true) }
 
     func menuDidClose(_ menu: NSMenu) {
         previousApp?.activate()
@@ -167,6 +179,20 @@ final class StatusMenu: NSObject, NSMenuDelegate {
     @objc private func toggleBuiltIn() { settings.builtInOnly.toggle(); refresh() }
     @objc private func toggleCalibrate() { settings.calibrating.toggle(); refresh() }
     @objc private func reset() { settings.radius = 26; settings.continuous = true; refresh() }
+    @objc private func hideIcon() {
+        // Let the menu finish closing before presenting the alert.
+        DispatchQueue.main.async { [self] in
+            Self.forceActivate()
+            let alert = NSAlert()
+            alert.messageText = "Hide the menu bar icon?"
+            alert.informativeText = "Round Corners keeps running. To show the icon again, open Round Corners from Spotlight or Finder."
+            alert.addButton(withTitle: "Hide Icon")
+            alert.addButton(withTitle: "Cancel")
+            guard alert.runModal() == .alertFirstButtonReturn else { return }
+            settings.hideIcon = true
+            item.isVisible = false
+        }
+    }
     @objc private func toggleLogin() {
         let svc = SMAppService.mainApp
         try? (svc.status == .enabled ? svc.unregister() : svc.register())
@@ -174,3 +200,10 @@ final class StatusMenu: NSObject, NSMenuDelegate {
     }
 }
 
+
+
+
+/// `activate(ignoringOtherApps:)` is deprecated but still the only call that activates a background
+/// app on demand; calling it through a protocol avoids the deprecation warning.
+@MainActor private protocol LegacyActivation { func activate(ignoringOtherApps: Bool) }
+extension NSApplication: LegacyActivation {}

@@ -20,4 +20,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { self.statusMenu?.open() }
         }
     }
+
+    /// Opening the app again while it's running restores a hidden menu bar icon.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        statusMenu?.showIcon()
+        return false
+    }
 }

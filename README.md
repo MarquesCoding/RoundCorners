@@ -15,6 +15,6 @@ Requires macOS 26+ and a Swift 6 toolchain.
 
 - **Radius:** defaults to 26 pt with Apple's continuous (squircle) curve.
 - **Calibrate:** draws a red guide on the top corners. Lower the radius until the line just disappears behind the physical edge; the bottom corners then match your hardware.
-- **Options:** round the top corners too (useful on external displays), limit to the built-in display, and launch at login. For launch at login to work best, move the app to `/Applications`.
+- **Options:** round the top corners too (useful on external displays), limit to the built-in display, launch at login, and hide the menu bar icon. Open the app again from Spotlight or Finder to bring the icon back. For launch at login to work best, move the app to `/Applications`.
 
 The mask is a click-through black overlay above the menu bar, the Dock, and full-screen apps. It does appear in screenshots and screen recordings.
